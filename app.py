@@ -67,7 +67,6 @@ with page2:
 
 with page3:
     st.title("Modelling")
-
     data = pd.read_csv(
         'https://raw.githubusercontent.com/errjak/dataset/main/BUKA.JK.csv')
     data = data[['Date', 'Close']]
@@ -105,16 +104,12 @@ with page3:
     pcaFile = 'pca.sav'
     pickle.dump(pca, open(pcaFile, 'wb'))
 
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, shuffle=False, test_size=0.2)
+
     with st.form(key='form3'):
         option = st.selectbox('Pilih Model yang diinginkan : ',
                               ('Naive Bayes', 'Decision Tree', 'MLP'))
-
-        submit_button = st.form_submit_button(label='Submit')
-
-    if submit_button:
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, shuffle=False, test_size=0.2)
-
         if option == 'Naive Bayes':
 
             st.write("Naive Bayes adalah sebuah metode klasifikasi menggunakan metode probabilitas dan statistik yg dikemukakan oleh ilmuwan Inggris Thomas Bayes.")
@@ -154,31 +149,27 @@ with page3:
             mape_MLP = mean_absolute_percentage_error(y_test, y_MLP)
             st.write("Hasil MAPE dari MLP : ", mape_MLP)
 
+        submit2 = st.form_submit_button(label='Submit')
+
+
 with page4:
     st.title("Prediksi")
     st.write("Masukkan data yang ingin diprediksi")
-
-    if exists('scaler.sav'):
-        scaler = pickle.load(open('scaler.sav', 'rb'))
-    if exists('pca.sav'):
-        pca = pickle.load(open('pca.sav', 'rb'))
     with st.form(key='form4'):
-        input1 = st.number_input('Masukkan data ke-1 : ', min_value=0.0)
-        input2 = st.number_input('Masukkan data ke-2 : ', min_value=0.0)
-        input3 = st.number_input('Masukkan data ke-3 : ', min_value=0.0)
+        option = st.selectbox('Pilih Model yang diinginkan : ',
+                              ('Naive Bayes', 'Decision Tree', 'MLP'))
+        input1 = st.number_input('Masukkan data ke-1 : ')
+        input2 = st.number_input('Masukkan data ke-2 : ')
+        input3 = st.number_input('Masukkan data ke-3 : ')
 
-        int1 = int(input1)
-        int2 = int(input2)
-        int3 = int(input3)
+        input = np.array([input1, input2, input3])
+        input = input.reshape(1, -1)
+        input = scaler.transform(input)
+        input = pca.transform(input)
 
         submit3 = st.form_submit_button(label='Submit')
 
         if submit3:
-            if scaler is not None:
-                input = scaler.transform([[int1, int2, int3]])
-            if pca is not None:
-                input = pca.transform(input)
-
             if option == 'Naive Bayes':
                 model_NB = pickle.load(open('model_NB.sav', 'rb'))
                 prediksi = model_NB.predict(input)
@@ -193,3 +184,45 @@ with page4:
                 model_MLP = pickle.load(open('model_MLP.sav', 'rb'))
                 prediksi = model_MLP.predict(input)
                 st.write("Prediksi harga saham : ", prediksi)
+
+        # if option == 'Naive Bayes':
+        #     st.write("Naive Bayes adalah sebuah metode klasifikasi menggunakan metode probabilitas dan statistik yg dikemukakan oleh ilmuwan Inggris Thomas Bayes.")
+        #     model_NB = pickle.load(open('model_NB.sav', 'rb'))
+        #     scaler = pickle.load(open('scaler.sav', 'rb'))
+        #     pca = pickle.load(open('pca.sav', 'rb'))
+
+        #     prediksi = model_NB.predict(input)
+
+        # elif option == 'Decision Tree':
+        #     st.write("Decision Tree adalah sebuah metode klasifikasi dengan membuat sebuah pohon keputusan dari data pembelajaran yang dimiliki.")
+        #     model_DT = pickle.load(open('model_DT.sav', 'rb'))
+        #     scaler = pickle.load(open('scaler.sav', 'rb'))
+        #     pca = pickle.load(open('pca.sav', 'rb'))
+
+        #     input1 = st.number_input('Masukkan data ke-1 : ')
+        #     input2 = st.number_input('Masukkan data ke-2 : ')
+        #     input3 = st.number_input('Masukkan data ke-3 : ')
+
+        #     input = np.array([input1, input2, input3])
+        #     input = input.reshape(1, -1)
+        #     input = scaler.transform(input)
+        #     input = pca.transform(input)
+
+        #     prediksi = model_DT.predict(input)
+
+        # elif option == 'MLP':
+        #     st.write("MLP adalah sebuah metode klasifikasi dengan menggunakan algoritma backpropagation untuk menghitung error dan mengupdate bobot.")
+        #     model_MLP = pickle.load(open('model_MLP.sav', 'rb'))
+        #     scaler = pickle.load(open('scaler.sav', 'rb'))
+        #     pca = pickle.load(open('pca.sav', 'rb'))
+
+        #     input1 = st.number_input('Masukkan data ke-1 : ')
+        #     input2 = st.number_input('Masukkan data ke-2 : ')
+        #     input3 = st.number_input('Masukkan data ke-3 : ')
+
+        #     input = np.array([input1, input2, input3])
+        #     input = input.reshape(1, -1)
+        #     input = scaler.transform(input)
+        #     input = pca.transform(input)
+
+        #     prediksi = model_MLP.predict(input)
